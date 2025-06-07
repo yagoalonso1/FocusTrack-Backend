@@ -3,7 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Producto;
+use App\Models\Paquete;
+use App\Models\Lista;
+use App\Models\ProductoPaquete;
+use App\Models\PaqueteLista;
+use App\Models\HistorialPaquetesPedido;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,11 +18,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->command->info('🌱 Iniciando seeders de FocusTrack...');
+        
+        // Ejecutar todos los seeders en el orden correcto
+        $this->call([
+            UserSeeder::class,
+            ProductoSeeder::class,
+            PaqueteSeeder::class,
+            ListaSeeder::class,
+            ProductoPaqueteSeeder::class,
+            PaqueteListaSeeder::class,
+            HistorialPaquetesPedidoSeeder::class,
         ]);
+
+        $this->command->info('🎉 ¡Todos los seeders ejecutados exitosamente!');
+        $this->command->info('📊 Base de datos poblada con datos de prueba para FocusTrack');
     }
 }
