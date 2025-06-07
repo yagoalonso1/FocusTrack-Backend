@@ -13,17 +13,26 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id_user';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
         'nombre',
-        'apellido',
+        'apellido1',
+        'apellido2',
         'email',
         'password',
-        'avatar_url',
-        'google_id',
+        'role',
+        'token_web',
+        'token_app',
    ];
 
     /**
@@ -34,6 +43,8 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'token_web',
+        'token_app',
     ];
 
     /**

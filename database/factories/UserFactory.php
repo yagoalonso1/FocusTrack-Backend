@@ -25,14 +25,26 @@ class UserFactory extends Factory
     {
         return [
             'nombre' => fake()->firstName(),
-            'apellido' => fake()->lastName(),
+            'apellido1' => fake()->lastName(),
+            'apellido2' => fake()->optional(0.7)->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'avatar_url' => fake()->imageUrl(),
-            'google_id' => null,
+            'role' => 'user',
+            'token_web' => null,
+            'token_app' => null,
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Estado para crear un admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
     }
 
     /**
