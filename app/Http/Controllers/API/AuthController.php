@@ -90,4 +90,58 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Cerrar sesión del usuario (logout)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        try {
+            // Revocar el token actual del usuario autenticado
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sesión cerrada exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Manejo de errores inesperados
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cerrar sesión',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Cerrar todas las sesiones del usuario (logout de todos los dispositivos)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logoutAll(Request $request): JsonResponse
+    {
+        try {
+            // Revocar todos los tokens del usuario autenticado
+            $request->user()->tokens()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Todas las sesiones han sido cerradas exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Manejo de errores inesperados
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cerrar todas las sesiones',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
