@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -80,6 +81,78 @@ class AuthController extends Controller
                     'token_type' => 'Bearer',
                 ]
             ], 201);
+
+        } catch (\Exception $e) {
+            // Manejo de errores inesperados
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno del servidor',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Iniciar sesión del usuario (login)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function login(Request $request): JsonResponse
+    {
+        try {
+            // Validar los datos de entrada
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string|email|max:255',
+                'password' => 'required|string|min:8',
+            ], [
+                'email.required' => 'El email es obligatorio',
+                'email.email' => 'El email debe ser válido',
+                'password.required' => 'La contraseña es obligatoria',
+                'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            ]);
+
+            // Si la validación falla, retornar errores
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error en los datos proporcionados',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Buscar el usuario por email
+            $user = User::where('email', $request->email)->first();
+
+            // Verificar si el usuario existe y la contraseña es correcta
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Las credenciales proporcionadas son incorrectas',
+                ], 401);
+            }
+
+            // Crear token de acceso
+            $token = $user->createToken('FocusTrack-Token')->plainTextToken;
+
+            // Respuesta exitosa
+            return response()->json([
+                'success' => true,
+                'message' => 'Inicio de sesión exitoso',
+                'data' => [
+                    'user' => [
+                        'id_user' => $user->id_user,
+                        'nombre' => $user->nombre,
+                        'apellido1' => $user->apellido1,
+                        'apellido2' => $user->apellido2,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                        'created_at' => $user->created_at,
+                    ],
+                    'token' => $token,
+                    'token_type' => 'Bearer',
+                ]
+            ], 200);
 
         } catch (\Exception $e) {
             // Manejo de errores inesperados
